@@ -18,6 +18,11 @@ public class Parser {
             return numbers;
         }
 
+        // 커스텀 구분자 패턴 ("//" 시작 시) 처리
+        if (input.startsWith("//")) {
+            return parseCustomSeparator(input);
+        }
+
         // 기본 구분자 사용 시 처리
         return parseBasicSeparator(input);
     }
@@ -43,6 +48,50 @@ public class Parser {
             }
 
             // 숫자 또는 기타 문자 처리
+            currentNumber.append(currentChar);
+        }
+
+        // 마지막 숫자 처리
+        appendNumber(currentNumber, numbers);
+        return numbers;
+    }
+
+    // 커스텀 구분자를 기준으로 숫자 파싱
+    private static List<Integer> parseCustomSeparator(String input) {
+        List<Integer> numbers = new ArrayList<>();
+        List<String> separators = new ArrayList<>();
+
+        // "\n"의 위치 확인 및 형식 검증
+        int newlineIndex = input.indexOf("\\n");
+        Validator.validateSeparatorFormat(newlineIndex);
+
+        // 커스텀 구분자 부분 추출 및 검증
+        String separatorPart = input.substring(2, newlineIndex);
+        Validator.validateCustomSeparator(separatorPart);
+
+        // 구분자 문자들을 리스트로 저장 (여러 커스텀 구분자 지정 가능)
+        for (char c : separatorPart.toCharArray()) {
+            separators.add(String.valueOf(c));
+        }
+
+        // 숫자 부분만 추출
+        input = input.substring(newlineIndex + 2);
+        StringBuilder currentNumber = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            String currentChar = String.valueOf(input.charAt(i));
+
+            // 커스텀 구분자면 숫자 추가
+            if (separators.contains(currentChar)) {
+                handleSeparator(currentNumber, numbers);
+                continue;
+            }
+
+            // 커스텀 구분자가 아닌 문자가 섞인 경우 검증
+            if (!Character.isDigit(input.charAt(i))) {
+                Validator.validateCustomSeparatorUsage(currentChar, separatorPart);
+            }
+
             currentNumber.append(currentChar);
         }
 
