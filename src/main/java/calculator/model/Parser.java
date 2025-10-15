@@ -8,7 +8,7 @@ public class Parser {
     // 기본 구분자 목록
     private static final List<String> BASIC_SEPARATORS = List.of(",", ":");
 
-    // 입력 문자열을 숫자 List로 변환
+    // 입력 문자열을 숫자 리스트로 변환
     public static List<Integer> parse(String input) {
         List<Integer> numbers = new ArrayList<>();
 
@@ -29,8 +29,8 @@ public class Parser {
 
     // 기본 구분자를 기준으로 숫자 파싱
     private static List<Integer> parseBasicSeparator(String input) {
-        List<Integer> numbers = new ArrayList<>();
-        StringBuilder currentNumber = new StringBuilder();
+        List<Integer> numbers = new ArrayList<>(); // 결과 리스트
+        StringBuilder currentNumber = new StringBuilder(); // 현재 토큰을 쌓는 버퍼
 
         for (int i = 0; i < input.length(); i++) {
             char currentChar = input.charAt(i);
@@ -41,13 +41,13 @@ public class Parser {
                 continue;
             }
 
-            // 기본 구분자면 숫자 추가 후 초기화
+            // 기본 구분자를 만나면 현재까지 버퍼를 숫자로 확정하고 버퍼를 초기화
             if (BASIC_SEPARATORS.contains(String.valueOf(currentChar))) {
                 handleSeparator(currentNumber, numbers);
                 continue;
             }
 
-            // 숫자 또는 기타 문자 처리
+            // 그 외의 숫자, 문자는 버퍼에 계속 추가
             currentNumber.append(currentChar);
         }
 
@@ -74,14 +74,14 @@ public class Parser {
             separators.add(String.valueOf(c));
         }
 
-        // 숫자 부분만 추출
+        // 커스텀 구분자 지정하는 부분 이후의 문자열만 남김
         input = input.substring(newlineIndex + 2);
         StringBuilder currentNumber = new StringBuilder();
 
         for (int i = 0; i < input.length(); i++) {
             String currentChar = String.valueOf(input.charAt(i));
 
-            // 커스텀 구분자면 숫자 추가
+            // 커스텀 구분자면 지금까지의 토큰 확정
             if (separators.contains(currentChar)) {
                 handleSeparator(currentNumber, numbers);
                 continue;
@@ -92,6 +92,7 @@ public class Parser {
                 Validator.validateCustomSeparatorUsage(currentChar, separatorPart);
             }
 
+            // 그 외의 숫자, 문자는 버퍼에 계속 추가
             currentNumber.append(currentChar);
         }
 
@@ -100,16 +101,18 @@ public class Parser {
         return numbers;
     }
 
-    // 구분자를 만났을 때 현재 숫자를 리스트에 추가
+    // 구분자를 만났을 때 현재 숫자를 토큰으로 확정
     private static void handleSeparator(StringBuilder currentNumber, List<Integer> numbers) {
         if (currentNumber.isEmpty()) {
             return;
         }
+        // 검증 후 정수 변환
         numbers.add(Validator.validateAndParseNumber(currentNumber.toString()));
+        //다음 숫자를 위해 초기화
         currentNumber.setLength(0);
     }
 
-    // 입력의 마지막 숫자 처리
+    // 입력의 마지막 숫자 처리 (마지막 숫자 토큰 확정, 초기화 생략)
     private static void appendNumber(StringBuilder currentNumber, List<Integer> numbers) {
         if (currentNumber.isEmpty()) {
             return;
