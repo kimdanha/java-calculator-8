@@ -79,7 +79,14 @@ public class Parser {
         StringBuilder currentNumber = new StringBuilder();
 
         for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
             String currentChar = String.valueOf(input.charAt(i));
+
+            // 음수 부호(-)는 숫자의 일부로 간주
+            if(ch == '-') {
+                currentNumber.append(ch);
+                continue;
+            }
 
             // 커스텀 구분자면 지금까지의 토큰 확정
             if (separators.contains(currentChar)) {
@@ -106,8 +113,10 @@ public class Parser {
         if (currentNumber.isEmpty()) {
             return;
         }
+
         // 검증 후 정수 변환
         numbers.add(Validator.validateAndParseNumber(currentNumber.toString()));
+
         //다음 숫자를 위해 초기화
         currentNumber.setLength(0);
     }
