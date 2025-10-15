@@ -104,4 +104,12 @@ class ApplicationTest extends NsTest {
                         .isInstanceOf(IllegalArgumentException.class)
         );
     }
+
+    @Test
+    void 커스텀_구분자_음수_예외_테스트() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("//;\\\\n1;-2"))
+                        .isInstanceOf(IllegalArgumentException.class)
+        );
+    }
 }
